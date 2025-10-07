@@ -20,6 +20,16 @@ class LuaLspServerDescriptor(project: Project) : ProjectWideLspServerDescriptor(
         return file.fileType == LuaFileType
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is LuaLspServerDescriptor) return false
+        return project == other.project
+    }
+
+    override fun hashCode(): Int {
+        return project.hashCode()
+    }
+
     override fun createCommandLine(): GeneralCommandLine {
         val settings = LuaLspSettings.getInstance()
         return GeneralCommandLine(settings.luaLanguageServerPath).apply {
