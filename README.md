@@ -10,6 +10,9 @@ LSP support.
 
 - Syntax highlighting
 - Code completion
+- Code formatting
+- Code folding
+- Code navigation (go to definition, find usages, etc.)
 - Error checking and diagnostics
 - Configuration options for Lua Language Server
 - Support for `.luarc` and `.luarc.json` configuration files

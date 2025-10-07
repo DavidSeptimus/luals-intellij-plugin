@@ -11,10 +11,21 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.platform.lsp.api.LspServer
 import com.intellij.platform.lsp.api.LspServerSupportProvider
 import com.intellij.platform.lsp.api.ProjectWideLspServerDescriptor
+import com.intellij.platform.lsp.api.customization.LspCustomization
+import com.intellij.platform.lsp.api.customization.LspFormattingSupport
 import com.intellij.platform.lsp.api.lsWidget.LspServerWidgetItem
 import java.io.File
 
 class LuaLspServerDescriptor(project: Project) : ProjectWideLspServerDescriptor(project, "Lua") {
+
+
+    override val lspCustomization: LspCustomization = object : LspCustomization() {
+        override val formattingCustomizer = object : LspFormattingSupport() {
+            override fun shouldFormatThisFileExclusivelyByServer(file: VirtualFile, ideCanFormatThisFileItself: Boolean, serverExplicitlyWantsToFormatThisFile: Boolean): Boolean {
+                return isSupportedFile(file) && !ideCanFormatThisFileItself
+            }
+        }
+    }
 
     override fun isSupportedFile(file: VirtualFile): Boolean {
         return file.fileType == LuaFileType
@@ -35,7 +46,7 @@ class LuaLspServerDescriptor(project: Project) : ProjectWideLspServerDescriptor(
         return GeneralCommandLine(settings.luaLanguageServerPath).apply {
             // Set locale
             val locale = LuaLocale.getLocale(settings.locale)
-            addParameter("--locale='$locale'")
+            addParameter("--locale=$locale")
 
             // Set working directory to project root
             project.basePath?.let { basePath ->
@@ -44,7 +55,7 @@ class LuaLspServerDescriptor(project: Project) : ProjectWideLspServerDescriptor(
                 // Prefer .luarc over .luarc.json if it exists
                 val luarcFile = File(basePath, ".luarc")
                 if (luarcFile.exists()) {
-                    addParameter("--configpath='${luarcFile.absolutePath}'")
+                    addParameter("--configpath=${luarcFile.absolutePath}")
                 }
             }
         }
