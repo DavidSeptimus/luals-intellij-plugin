@@ -62,7 +62,7 @@ class LuaRunConfigurationEditor(project: Project) : SettingsEditor<LuaRunConfigu
         }
         row("Working directory:") {
             cell(workingDirectoryField)
-                .resizableColumn()
+                .align(AlignX.FILL)
                 .comment("Working directory for script execution (default: script directory)")
         }
     }
