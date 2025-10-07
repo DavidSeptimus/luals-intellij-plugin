@@ -23,5 +23,5 @@ class LuarcJsonSchemaFileProvider : JsonSchemaFileProvider {
 
     override fun getSchemaType(): SchemaType = SchemaType.remoteSchema
 
-    override fun getRemoteSource(): String = "https://www.schemastore.org/luaurc.json"
+    override fun getRemoteSource(): String = "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json"
 }
