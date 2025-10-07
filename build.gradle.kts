@@ -1,6 +1,8 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.extensions.IntelliJPlatformDependenciesExtension
+import org.jetbrains.intellij.pluginRepository.PluginRepositoryFactory
 
 plugins {
     id("java") // Java support
@@ -29,27 +31,58 @@ repositories {
     }
 }
 
+
+// Helper function to resolve plugins in latest compatible version from JetBrains Marketplace
+fun IntelliJPlatformDependenciesExtension.pluginsInLatestCompatibleVersion(pluginIdProvider: Provider<List<String>>) =
+    plugins(provider {
+        val pluginRepository = PluginRepositoryFactory.create("https://plugins.jetbrains.com")
+        val platformType = intellijPlatform.productInfo.productCode
+        val platformVersion = intellijPlatform.productInfo.buildNumber
+        pluginIdProvider.get().map { pluginId ->
+            val plugin = pluginRepository.pluginManager.searchCompatibleUpdates(
+                build = "$platformType-$platformVersion",
+                xmlIds = listOf(pluginId),
+            ).firstOrNull()
+                ?: throw GradleException("No plugin update with id='$pluginId' compatible with '$platformType-$platformVersion' found in JetBrains Marketplace")
+            "${plugin.pluginXmlId}:${plugin.version}"
+        }
+    })
+
+
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.opentest4j)
 
+    // Safely create a PluginRepository instance for use in this block
+    val pluginRepository = PluginRepositoryFactory.create("https://plugins.jetbrains.com")
+
+
     // IntelliJ Platform Gradle Plugin Dependencies Extension - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-dependencies-extension.html
     intellijPlatform {
         create(providers.gradleProperty("platformType"), providers.gradleProperty("platformVersion"))
 
+        // Example usage: If you need to use pluginRepository, do so here
+        // e.g., plugins(pluginRepository.resolve("some-plugin-id"))
+        // (Replace with actual usage as needed)
+
         // Plugin Dependencies. Uses `platformBundledPlugins` property from the gradle.properties file for bundled IntelliJ Platform plugins.
-        bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(',') })
+//        bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(',') })
 
         // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file for plugin from JetBrains Marketplace.
-        plugins(providers.gradleProperty("platformPlugins").map { it.split(',') })
+//        plugins(providers.gradleProperty("platformPlugins").map { it.split(',') })
 
         // Module Dependencies. Uses `platformBundledModules` property from the gradle.properties file for bundled IntelliJ Platform modules.
         bundledModules(providers.gradleProperty("platformBundledModules").map { it.split(',') })
 
+
+//        pluginsInLatestCompatibleVersion(
+//            providers.gradleProperty("platformPluginsLatestCompatibleVersion").map { it.split(',') })
+
         testFramework(TestFrameworkType.Platform)
     }
 }
+
 
 // Configure IntelliJ Platform Gradle Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-extension.html
 intellijPlatform {
@@ -99,7 +132,8 @@ intellijPlatform {
         // The pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
         // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
         // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
-        channels = providers.gradleProperty("pluginVersion").map { listOf(it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" }) }
+        channels = providers.gradleProperty("pluginVersion")
+            .map { listOf(it.substringAfter('-', "").substringBefore('.').ifEmpty { "default" }) }
     }
 
     pluginVerification {

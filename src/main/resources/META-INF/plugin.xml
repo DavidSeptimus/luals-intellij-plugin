@@ -1,15 +1,59 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.github.davidseptimus.lualsintellijplugin</id>
-    <name>luals-intellij-plugin</name>
+    <name>Lua Language Support</name>
     <vendor>davidseptimus</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lsp</depends>
+    <depends>com.intellij.modules.ultimate</depends>
+    <depends>com.intellij.modules.json</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.davidseptimus.lualsintellijplugin.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="com.github.davidseptimus.lualsintellijplugin.startup.MyProjectActivity" />
+        <!-- Lua Language Support -->
+        <fileType name="Lua"
+                  implementationClass="com.github.davidseptimus.lualsintellijplugin.LuaFileType"
+                  fieldName="INSTANCE"
+                  language="Lua"
+                  extensions="lua;luarc"/>
+
+        <!-- LSP Support -->
+        <platform.lsp.serverSupportProvider
+                implementation="com.github.davidseptimus.lualsintellijplugin.lsp.LuaLspServerSupportProvider"/>
+
+        <!-- Settings -->
+        <applicationService
+                serviceImplementation="com.github.davidseptimus.lualsintellijplugin.settings.LuaLspSettings"/>
+        <applicationConfigurable
+                parentId="tools"
+                instance="com.github.davidseptimus.lualsintellijplugin.settings.LuaLspSettingsConfigurable"
+                id="com.github.davidseptimus.lualsintellijplugin.settings.LuaLspSettingsConfigurable"
+                displayName="Lua Language Server"/>
+
+        <!-- Run Configuration -->
+        <configurationType implementation="com.github.davidseptimus.lualsintellijplugin.run.LuaRunConfigurationType"/>
+        <runConfigurationProducer
+                implementation="com.github.davidseptimus.lualsintellijplugin.run.LuaRunConfigurationProducer"/>
+
+        <!-- Notifications -->
+        <notificationGroup id="Lua Language Server" displayType="BALLOON" bundle="messages.MyBundle"
+                           key="notification.group.lua.language.server"/>
     </extensions>
+
+    <extensions defaultExtensionNs="JavaScript.JsonSchema">
+        <ProviderFactory
+                implementation="com.github.davidseptimus.lualsintellijplugin.schema.LuarcJsonSchemaProviderFactory"/>
+    </extensions>
+
+    <applicationListeners>
+        <listener class="com.github.davidseptimus.lualsintellijplugin.listeners.LuaConfigFileListener"
+                  topic="com.intellij.openapi.fileEditor.FileDocumentManagerListener"/>
+    </applicationListeners>
+
+    <projectListeners>
+        <listener class="com.github.davidseptimus.lualsintellijplugin.run.LuaRunGutterIconProvider"
+                  topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
+    </projectListeners>
 </idea-plugin>
