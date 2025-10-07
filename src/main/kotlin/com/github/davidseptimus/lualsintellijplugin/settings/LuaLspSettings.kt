@@ -12,6 +12,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 )
 class LuaLspSettings : PersistentStateComponent<LuaLspSettings> {
     var luaLanguageServerPath: String = "lua-language-server"
+    var luaExecutablePath: String = "lua"
     var locale: String = "" // Empty string means "use IDE language"
 
     override fun getState(): LuaLspSettings = this

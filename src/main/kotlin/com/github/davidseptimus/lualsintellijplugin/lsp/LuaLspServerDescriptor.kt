@@ -1,17 +1,20 @@
 package com.github.davidseptimus.lualsintellijplugin.lsp
 
 import com.github.davidseptimus.lualsintellijplugin.LuaFileType
+import com.github.davidseptimus.lualsintellijplugin.LuaIcons
 import com.github.davidseptimus.lualsintellijplugin.settings.LuaLocale
 import com.github.davidseptimus.lualsintellijplugin.settings.LuaLspSettings
+import com.github.davidseptimus.lualsintellijplugin.settings.LuaLspSettingsConfigurable
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.platform.lsp.api.LspServer
 import com.intellij.platform.lsp.api.LspServerSupportProvider
 import com.intellij.platform.lsp.api.ProjectWideLspServerDescriptor
+import com.intellij.platform.lsp.api.lsWidget.LspServerWidgetItem
 import java.io.File
 
 class LuaLspServerDescriptor(project: Project) : ProjectWideLspServerDescriptor(project, "Lua") {
-
 
     override fun isSupportedFile(file: VirtualFile): Boolean {
         return file.fileType == LuaFileType
@@ -22,7 +25,7 @@ class LuaLspServerDescriptor(project: Project) : ProjectWideLspServerDescriptor(
         return GeneralCommandLine(settings.luaLanguageServerPath).apply {
             // Set locale
             val locale = LuaLocale.getLocale(settings.locale)
-            addParameter("--locale=$locale")
+            addParameter("--locale='$locale'")
 
             // Set working directory to project root
             project.basePath?.let { basePath ->
@@ -31,7 +34,7 @@ class LuaLspServerDescriptor(project: Project) : ProjectWideLspServerDescriptor(
                 // Prefer .luarc over .luarc.json if it exists
                 val luarcFile = File(basePath, ".luarc")
                 if (luarcFile.exists()) {
-                    addParameter("--configpath=${luarcFile.absolutePath}")
+                    addParameter("--configpath='${luarcFile.absolutePath}'")
                 }
             }
         }
@@ -47,5 +50,9 @@ class LuaLspServerSupportProvider : LspServerSupportProvider {
         if (file.fileType == LuaFileType) {
             serverStarter.ensureServerStarted(LuaLspServerDescriptor(project))
         }
+    }
+
+    override fun createLspServerWidgetItem(lspServer: LspServer, currentFile: VirtualFile?): LspServerWidgetItem {
+        return LspServerWidgetItem(lspServer, currentFile, LuaIcons.Lua, LuaLspSettingsConfigurable::class.java)
     }
 }

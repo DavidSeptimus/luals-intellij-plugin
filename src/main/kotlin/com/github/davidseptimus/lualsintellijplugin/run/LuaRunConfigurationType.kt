@@ -1,16 +1,16 @@
 package com.github.davidseptimus.lualsintellijplugin.run
 
+import com.github.davidseptimus.lualsintellijplugin.LuaIcons
 import com.intellij.execution.configurations.ConfigurationFactory
 import com.intellij.execution.configurations.ConfigurationTypeBase
 import com.intellij.execution.configurations.RunConfiguration
-import com.intellij.icons.AllIcons
 import com.intellij.openapi.project.Project
 
 class LuaRunConfigurationType : ConfigurationTypeBase(
     "LuaRunConfiguration",
     "Lua",
     "Lua run configuration",
-    AllIcons.RunConfigurations.Application
+    LuaIcons.Lua
 ) {
     init {
         addFactory(object : ConfigurationFactory(this) {

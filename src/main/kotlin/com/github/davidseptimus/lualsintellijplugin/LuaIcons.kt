@@ -5,7 +5,8 @@ import javax.swing.Icon
 
 class LuaIcons {
     companion object {
-        val FILE: Icon = IconLoader.getIcon("/icons/luaFileIcon.svg", LuaIcons::class.java)
+        val File: Icon = IconLoader.getIcon("/icons/luaFileIcon.svg", LuaIcons::class.java)
+        val Lua: Icon = IconLoader.getIcon("/icons/luaIcon.svg", LuaIcons::class.java)
     }
 
 }
