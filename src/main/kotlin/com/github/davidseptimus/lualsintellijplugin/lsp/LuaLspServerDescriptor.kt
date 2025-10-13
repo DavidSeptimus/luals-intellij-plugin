@@ -20,8 +20,16 @@ class LuaLspServerDescriptor(project: Project) : ProjectWideLspServerDescriptor(
 
 
     override val lspCustomization: LspCustomization = object : LspCustomization() {
+
+
+        override val semanticTokensCustomizer = LuaSemanticTokensCustomizer()
+
         override val formattingCustomizer = object : LspFormattingSupport() {
-            override fun shouldFormatThisFileExclusivelyByServer(file: VirtualFile, ideCanFormatThisFileItself: Boolean, serverExplicitlyWantsToFormatThisFile: Boolean): Boolean {
+            override fun shouldFormatThisFileExclusivelyByServer(
+                file: VirtualFile,
+                ideCanFormatThisFileItself: Boolean,
+                serverExplicitlyWantsToFormatThisFile: Boolean
+            ): Boolean {
                 return isSupportedFile(file) && !ideCanFormatThisFileItself
             }
         }

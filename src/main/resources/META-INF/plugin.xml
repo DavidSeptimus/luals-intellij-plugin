@@ -40,6 +40,8 @@
         <!-- Notifications -->
         <notificationGroup id="Lua Language Server" displayType="BALLOON" bundle="messages.MyBundle"
                            key="notification.group.lua.language.server"/>
+        <colorSettingsPage
+            implementation="com.github.davidseptimus.lualsintellijplugin.lsp.LuaColorSettingsPage"/>
     </extensions>
 
     <extensions defaultExtensionNs="JavaScript.JsonSchema">
