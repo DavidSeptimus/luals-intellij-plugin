@@ -14,6 +14,7 @@ import com.intellij.platform.lsp.api.ProjectWideLspServerDescriptor
 import com.intellij.platform.lsp.api.customization.LspCustomization
 import com.intellij.platform.lsp.api.customization.LspFormattingSupport
 import com.intellij.platform.lsp.api.lsWidget.LspServerWidgetItem
+import org.eclipse.lsp4j.InitializeParams
 import java.io.File
 
 class LuaLspServerDescriptor(project: Project) : ProjectWideLspServerDescriptor(project, "Lua") {
@@ -65,6 +66,11 @@ class LuaLspServerDescriptor(project: Project) : ProjectWideLspServerDescriptor(
                 if (luarcFile.exists()) {
                     addParameter("--configpath=${luarcFile.absolutePath}")
                 }
+
+                // Configure logging to lua.log in project root
+                val logFile = File(basePath, "lua.log")
+                addParameter("--logpath=${logFile.absolutePath}")
+                addParameter("--loglevel=trace")
             }
         }
     }

@@ -12,10 +12,32 @@ open class LuaSemanticTokensCustomizer : LspSemanticTokensSupport() {
     }
 
     override val tokenModifiers: List<String> = listOf(
-        "declaration", "definition", "readonly", "static", "deprecated", "abstract", "async", "modification", "documentation", "defaultLibrary", "global", "local"
+        "declaration", "definition", "readonly", "static", "deprecated", "abstract", "async", "modification", "documentation", "defaultLibrary", "global"
     )
     override val tokenTypes: List<String> = listOf(
-       "if", "then", "keyword", "end", "else", "end", "namespace", "type", "class", "enum", "interface", "struct", "typeParameter", "parameter", "variable", "property", "enumMember", "event", "function", "method", "macro", "keyword", "modifier", "comment", "string", "number", "regexp", "operator", "decorator"
+        "namespace",     // 0
+        "type",          // 1
+        "class",         // 2
+        "enum",          // 3
+        "interface",     // 4
+        "struct",        // 5
+        "typeParameter", // 6
+        "parameter",     // 7
+        "variable",      // 8
+        "property",      // 9
+        "enumMember",    // 10
+        "event",         // 11
+        "function",      // 12
+        "method",        // 13
+        "macro",         // 14
+        "keyword",       // 15
+        "modifier",      // 16
+        "comment",       // 17
+        "string",        // 18
+        "number",        // 19
+        "regexp",        // 20
+        "operator",      // 21
+        "decorator"      // 22
     )
 
     override fun getTextAttributesKey(tokenType: String, modifiers: List<String>): TextAttributesKey? =
@@ -43,10 +65,9 @@ open class LuaSemanticTokensCustomizer : LspSemanticTokensSupport() {
             "regexp"        -> LuaTextAttributesKeys.REGEXP
             "operator"      -> LuaTextAttributesKeys.OPERATOR
             "decorator"     -> LuaTextAttributesKeys.DECORATOR
-            "local" -> LuaTextAttributesKeys.KEYWORD
             else -> {
                 System.err.println("Unknown token type: $tokenType")
-                LuaTextAttributesKeys.STRING
+                null
             }
         }
 
